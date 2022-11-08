@@ -1,4 +1,4 @@
-# Lapres Jarkom Modul 2 Kelompok D05 #
+# Lapres Jarkom Modul 3 Kelompok D05 #
 
 | Nama Praktikan  | NRP Praktikan |
 | ------------- | ------------- |
