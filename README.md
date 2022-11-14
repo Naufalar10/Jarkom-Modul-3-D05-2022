@@ -8,8 +8,6 @@
 
 
 # SOAL DAN JAWABAN PRAKTIKUM
-## Pendahuluan
-(gambar)
 
 # SOAL 1
 Loid bersama Franky berencana membuat peta tersebut dengan kriteria WISE sebagai DNS Server, Westalis sebagai DHCP Server, Berlint sebagai Proxy Server
