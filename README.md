@@ -302,3 +302,62 @@ cp dhcpd7.conf /etc/dhcp/dhcpd.conf
 service isc-dhcp-server restart 
 ```
 Hal itu menyebabkan IP fixed address pada node Eden yang memiliki interface eth0 berubah menjadi 192.187.3.13/24
+
+## Proxy Server
+### Soal 1
+> Client hanya dapat mengakses internet diluar (selain) hari & jam kerja (senin-jumat 08.00 - 17.00) dan hari libur (dapat mengakses 24 jam penuh)
+
+Buatlah file `acl.conf` dalam `/etc/squid/` dan setelah itu masukkan syntax berikut ke dalam file tersebut:
+```bash
+acl AVAILABLE_WORKING time MTWHF 17:01-23:59
+acl AVAILABLE_WORKING time MTWHF 00:00-07:59
+acl AVAILABLE_WORKING time AS 00:00-23:59
+```
+Dimana pada MTWHF (Senin - Jumat) hanya dapat mengakses pada jam 08.00 - 17.00 dan AS (Sabtu dan Minggu) bisa diakses seharian.
+
+`acl AVAILABLE_WORKING time MTWHF 17:01-23:59` dan `acl AVAILABLE_WORKING time MTWHF 00:00-07:59` dipisah karena syarat penamaan harus h1<h2 dan m1<m2.
+
+Lalu buka dan ubah file `squid.conf` menjadi berikut:
+                                     
+```bash
+include /etc/squid/acl.conf
+
+http_port 5000
+http_access allow AVAILABLE_WORKING
+http_access deny all
+visible_hostname Berlint
+```
+
+Simpan file tersebut lalu restart squid dengan
+```bash
+service squid restart
+```
+
+### Soal 2
+> Adapun pada hari dan jam kerja sesuai nomor (1), client hanya dapat mengakses domain loid-work.com dan franky-work.com (IP tujuan domain dibebaskan)
+
+Dalam `acl.conf` masukkan syntax berikut untuk menentukkan working timenya:
+```bash
+acl working_hour time MTWHF 08:00-17:00
+acl loid_work dstdomain loid-work.com
+acl franky_work dstdomain franky-work.com
+```
+Dimana `working_hour` merupakan waktu kerja dari senin-jumat pukul 08:00-17:00 dan `dstdomain` untuk mengantarkan `loid_work` ke domain `loid-work.com` dan `franky_work` ke domain `franky-work.com`.
+
+Setelah itu, tambahkan syntax berikut ke file `squid.conf` untuk memberikan akses `loid-work.com` dan `franky-work.com` di jam kerja:
+```bash
+include /etc/squid/acl.conf
+
+http_port 5000
+http_access allow loid_work working_hour
+http_access allow franky_work working_hour
+
+http_access deny loid_work AVAILABLE_WORKING
+http_access deny franky_work AVAILABLE_WORKING
+visible_hostname Berlint
+```
+
+Simpan file tersebut lalu restart squid dengan
+```bash
+service squid restart
+```
