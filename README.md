@@ -361,3 +361,42 @@ Simpan file tersebut lalu restart squid dengan
 ```bash
 service squid restart
 ```
+### Soal 3
+Saat akses internet dibuka, client dilarang untuk mengakses web tanpa HTTPS. (Contoh web HTTP: http://example.com)
+
+Untuk mengerjakan ini, dengan mengisi:
+```
+acl HTTPS_PORT port 443
+```
+Di dalam `acl.conf`. Lalu, masukkan 
+```
+http_access deny !HTTPS_PORT
+```
+Ke dalam `squid.conf`. Di dalam internet, port 443 merupakan port yang dipakai oleh HTTPS. Jika http access bukan merupakan port HTTPS, maka squid akan menolak koneksi tersebut.
+
+Simpan file tersebut lalu restart squid dengan
+```bash
+service squid restart
+```
+
+### Soal 4 & 5
+> Agar menghemat penggunaan, akses internet dibatasi dengan kecepatan maksimum 128 Kbps pada setiap host (Kbps = kilobit per second; lakukan pengecekan pada tiap host, ketika 2 host akses internet pada saat bersamaan, keduanya mendapatkan speed maksimal yaitu 128 Kbps).
+
+> Setelah diterapkan, ternyata peraturan nomor (4) mengganggu produktifitas saat hari kerja, dengan demikian pembatasan kecepatan hanya diberlakukan untuk pengaksesan internet pada hari libur.
+
+Untuk mengerjakan soal ini, kita perlu menambahkan syntax untuk membatasi pembatasan bandwith di hari yang diinginkan (yaitu hari sabtu-minggu) ke dalam `acl.conf` sebagai berikut:
+
+```bash
+acl WEEKENDS time AS 00:00-23:59 
+```
+Lalu masukkan syntax tersebut ke dalam `squid.conf` untuk membuat pembatasan bandwith menjadi 128kbps dengan memasukkan input `128000/128000` ke dalam `delay parameters 1` dan set `delay_access 1` ke WEEKENDS
+```bash
+delay_pools 1
+delay_class 1 1
+delay_parameters 1 128000/128000
+delay_access 1 allow WEEKENDS
+```
+Simpan file tersebut lalu restart squid dengan
+```bash
+service squid restart
+```
